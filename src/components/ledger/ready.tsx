@@ -1,28 +1,24 @@
 import { useEffect, useState } from "react";
-import { hydrateLedger, useLedger } from "@/lib/ledger/store";
+import { currentSession, onAuth } from "@/lib/ledger/auth";
+import { hydrateLedger } from "@/lib/ledger/store";
 
 export function useLedgerReady() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     let stop = false;
-    const done = () => {
+    const boot = async () => {
+      const session = await currentSession();
+      if (session) await hydrateLedger();
       if (!stop) setReady(true);
     };
-    const unsub = useLedger.persist.onFinishHydration(done);
-    void useLedger.persist.rehydrate();
-    if (useLedger.persist.hasHydrated()) done();
-
-    void hydrateLedger();
-
-    const onStorage = (event: StorageEvent) => {
-      if (event.key === "ledger-mvp-v1") void useLedger.persist.rehydrate();
-    };
-    window.addEventListener("storage", onStorage);
+    void boot();
+    const unsub = onAuth(() => {
+      void boot();
+    });
     return () => {
       stop = true;
       unsub();
-      window.removeEventListener("storage", onStorage);
     };
   }, []);
 

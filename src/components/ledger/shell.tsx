@@ -1,7 +1,10 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { cx } from "./primitives";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { cx, Field, PrimaryButton, fieldClass } from "./primitives";
 import { ThemeToggle } from "./theme";
 import { useLedger } from "@/lib/ledger/store";
+import { currentSession, onAuth, signOut } from "@/lib/ledger/auth";
+import { BootMark } from "./ready";
 
 const NAV = [
   { to: "/", label: "Timeline" },
@@ -24,8 +27,32 @@ export function StudioShell({
   const projects = useLedger((s) => s.projects);
   const activeProjectId = useLedger((s) => s.activeProjectId);
   const setActiveProject = useLedger((s) => s.setActiveProject);
-  const reset = useLedger((s) => s.reset);
+  const createProject = useLedger((s) => s.createProject);
   const project = projects.find((p) => p.id === activeProjectId) ?? projects[0];
+  const navigate = useNavigate();
+  const [session, setSession] = useState<"loading" | "in" | "out">("loading");
+  const [adding, setAdding] = useState(false);
+  const [draft, setDraft] = useState({ name: "", client: "", location: "" });
+
+  useEffect(() => {
+    let stop = false;
+    const check = async () => {
+      const next = await currentSession();
+      if (!stop) setSession(next ? "in" : "out");
+    };
+    void check();
+    const unsub = onAuth(() => void check());
+    return () => {
+      stop = true;
+      unsub();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (session === "out") navigate({ to: "/sign-in" });
+  }, [session, navigate]);
+
+  if (session !== "in") return <BootMark />;
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
@@ -82,10 +109,10 @@ export function StudioShell({
                   </option>
                 ))}
               </select>
-              {project ? (
+              {project?.clientToken ? (
                 <Link
-                  to="/client/$projectId"
-                  params={{ projectId: project.id }}
+                  to="/c/$token"
+                  params={{ token: project.clientToken }}
                   className="inline-flex h-11 shrink-0 items-center rounded-sm border border-hairline px-4 text-sm font-medium text-ink hover:bg-surface"
                 >
                   Client view
@@ -99,16 +126,52 @@ export function StudioShell({
         <h1 className="font-display text-display font-medium tracking-tight">{title}</h1>
         {lede ? <p className="mt-4 max-w-2xl text-base leading-relaxed text-body">{lede}</p> : null}
         <div className="mt-10">{children}</div>
+        <div className="mt-16 border-t border-hairline pt-8">
+          {adding ? (
+            <form
+              className="max-w-xl space-y-4"
+              onSubmit={(event) => {
+                event.preventDefault();
+                createProject({
+                  name: draft.name,
+                  clientName: draft.client,
+                  location: draft.location,
+                  firm: project?.firm || "Studio",
+                });
+                setAdding(false);
+                setDraft({ name: "", client: "", location: "" });
+              }}
+            >
+              <h2 className="font-display text-title font-medium">New project</h2>
+              <Field label="Project">
+                <input className={fieldClass} value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} required />
+              </Field>
+              <Field label="Client">
+                <input className={fieldClass} value={draft.client} onChange={(e) => setDraft({ ...draft, client: e.target.value })} required />
+              </Field>
+              <Field label="Location">
+                <input className={fieldClass} value={draft.location} onChange={(e) => setDraft({ ...draft, location: e.target.value })} />
+              </Field>
+              <PrimaryButton type="submit">Create project</PrimaryButton>
+            </form>
+          ) : (
+            <button type="button" onClick={() => setAdding(true)} className="text-sm font-medium text-ink underline-offset-4 hover:underline">
+              New project
+            </button>
+          )}
+        </div>
       </main>
       <footer className="mx-auto max-w-5xl px-5 pb-28 md:px-8">
         <div className="flex flex-col gap-3 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-muted">A record of what was agreed. Shared with the client.</p>
           <button
             type="button"
-            onClick={() => reset()}
+            onClick={() => {
+              void signOut().then(() => navigate({ to: "/sign-in" }));
+            }}
             className="h-11 self-start text-sm text-ink underline-offset-4 hover:underline"
           >
-            Reset sample studio
+            Sign out
           </button>
         </div>
       </footer>

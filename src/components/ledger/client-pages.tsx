@@ -81,7 +81,7 @@ export function ClientHome({ projectId }: { projectId: string }) {
           <ul className="mt-4 space-y-6">
             {waiting.map((req) => (
               <li key={req.id}>
-                <Link to="/approve/$requestId" params={{ requestId: req.id }} className="block">
+                <Link to="/c/$token/approve/$requestId" params={{ token: project.clientToken ?? "", requestId: req.id }} className="block">
                   {req.image ? (
                     <Photo src={req.image} alt="" className="aspect-[3/2] w-full rounded-md" />
                   ) : null}
@@ -187,8 +187,8 @@ export function ApprovalPage({ requestId }: { requestId: string }) {
       <header className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <Link
-            to="/client/$projectId"
-            params={{ projectId: project.id }}
+            to="/c/$token"
+            params={{ token: project.clientToken ?? "" }}
             className="font-display text-2xl leading-none tracking-tight"
           >
             Ledger
@@ -411,8 +411,8 @@ export function ApprovalPage({ requestId }: { requestId: string }) {
         </p>
         <p className="mt-1 text-sm text-muted">{formatDay(req.createdAt)}</p>
         <Link
-          to="/client/$projectId"
-          params={{ projectId: project.id }}
+          to="/c/$token"
+          params={{ token: project.clientToken ?? "" }}
           className="mt-4 inline-flex h-12 items-center text-sm font-medium underline-offset-4 hover:underline"
         >
           Back to the project

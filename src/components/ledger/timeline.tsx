@@ -24,11 +24,15 @@ export function TimelinePage() {
   return (
     <StudioShell title={project.name} lede={lede}>
       <figure>
-        <Photo
-          src={project.cover}
-          alt={`${project.name} in ${project.location}`}
-          className="aspect-[16/9] w-full rounded-lg"
-        />
+        {project.cover ? (
+          <Photo
+            src={project.cover}
+            alt={`${project.name} in ${project.location}`}
+            className="aspect-[16/9] w-full rounded-lg"
+          />
+        ) : (
+          <div className="aspect-[16/9] w-full rounded-lg bg-surface" />
+        )}
         <figcaption className="mt-3 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-sm">
           <span className="text-ink">{project.typology}</span>
           <span className="text-muted">

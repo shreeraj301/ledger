@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { inr } from "./format";
-import { loadRemote, remoteEnabled, saveRemote, watchRemote } from "./remote";
+import { loadRemote, remoteEnabled, saveRemote, saveClient, watchRemote, ensureFirm, loadClient } from "./remote";
 import { SEED } from "./seed";
 import type {
   ActorRole,
@@ -40,6 +40,7 @@ interface Actions {
     actorRole: ActorRole;
   }) => void;
   createRequest: (input: CreateRequestInput) => string;
+  createProject: (input: { name: string; clientName: string; location: string; firm: string }) => void;
   reset: () => void;
 }
 
@@ -360,6 +361,37 @@ export const useLedger = create<LedgerState>()(
         });
         return id;
       },
+      createProject: ({ name, clientName, location, firm }) => {
+        const id = uid("prj");
+        const token = crypto.randomUUID().replace(/-/g, "");
+        const project = {
+          id,
+          name: name.trim(),
+          shortName: name.trim(),
+          clientName: clientName.trim(),
+          household: clientName.trim(),
+          location: location.trim(),
+          typology: "New project",
+          architect: "",
+          firm,
+          cover: "",
+          clientToken: token,
+        };
+        const phase = {
+          id: uid("ph"),
+          projectId: id,
+          name: "Concept",
+          order: 1,
+          status: "current" as const,
+          clientRole: "Agree the direction before drawings start.",
+          span: "",
+        };
+        set({
+          projects: [project, ...get().projects],
+          phases: [...get().phases, phase],
+          activeProjectId: id,
+        });
+      },
       reset: () => set(fresh()),
     }),
     {
@@ -379,6 +411,8 @@ export const useLedger = create<LedgerState>()(
 );
 
 let remoteLive = false;
+let subscribed = false;
+let clientToken: string | null = null;
 let applyingRemote = false;
 let saveTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -398,31 +432,48 @@ function scheduleSave() {
   if (!remoteLive || applyingRemote) return;
   if (saveTimer) clearTimeout(saveTimer);
   saveTimer = setTimeout(() => {
-    void saveRemote(snapshot(useLedger.getState())).catch(() => {});
+    const data = snapshot(useLedger.getState());
+    const write = clientToken ? saveClient(clientToken, data) : saveRemote(data);
+    void write.catch(() => {});
   }, 400);
+}
+
+function applyRemote(next: LedgerData) {
+  applyingRemote = true;
+  useLedger.setState(next);
+  applyingRemote = false;
 }
 
 export async function hydrateLedger() {
   if (!remoteEnabled || typeof window === "undefined") return false;
   try {
+    clientToken = null;
+    await ensureFirm();
     const remote = await loadRemote();
-    applyingRemote = true;
-    if (remote) {
-      useLedger.setState(remote);
-    } else {
-      await saveRemote(snapshot(useLedger.getState()));
-    }
-    applyingRemote = false;
+    if (remote) applyRemote(remote);
     remoteLive = true;
-    watchRemote((next) => {
-      applyingRemote = true;
-      useLedger.setState(next);
-      applyingRemote = false;
-    });
-    useLedger.subscribe(() => scheduleSave());
+    watchRemote((next) => applyRemote(next));
+    if (!subscribed) {
+      subscribed = true;
+      useLedger.subscribe(() => scheduleSave());
+    }
     return true;
   } catch {
     applyingRemote = false;
     return false;
   }
+}
+
+export async function hydrateClient(token: string) {
+  if (!remoteEnabled) return false;
+  const remote = await loadClient(token);
+  if (!remote) return false;
+  clientToken = token;
+  applyRemote(remote);
+  remoteLive = true;
+  if (!subscribed) {
+    subscribed = true;
+    useLedger.subscribe(() => scheduleSave());
+  }
+  return true;
 }

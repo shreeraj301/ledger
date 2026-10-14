@@ -18,6 +18,7 @@ export interface Project {
   architect: string;
   firm: string;
   cover: string;
+  clientToken?: string;
 }
 
 export interface Phase {

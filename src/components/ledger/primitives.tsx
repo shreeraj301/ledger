@@ -2,6 +2,7 @@ import { useState, type Ref } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { clsx } from "clsx";
 import { dotClass, statusLabel } from "@/lib/ledger/format";
+import { useLedger } from "@/lib/ledger/store";
 
 export function cx(...parts: Array<string | false | null | undefined>) {
   return clsx(parts);
@@ -131,13 +132,15 @@ export function QuietButton({
 
 export function CopyLink({ requestId }: { requestId: string }) {
   const router = useRouter();
+  const token = useRouterStateToken();
   const [state, setState] = useState<"idle" | "copied" | "shown">("idle");
   const [url, setUrl] = useState("");
 
   const resolve = () => {
+    if (!token) return window.location.href;
     const href = router.buildLocation({
-      to: "/approve/$requestId",
-      params: { requestId },
+      to: "/c/$token/approve/$requestId",
+      params: { token, requestId },
     }).href;
     return new URL(href, window.location.origin).toString();
   };
@@ -174,13 +177,21 @@ export function CopyLink({ requestId }: { requestId: string }) {
 }
 
 export function OpenClient({ requestId, label = "Open client view" }: { requestId: string; label?: string }) {
+  const token = useRouterStateToken();
+  if (!token) return null;
   return (
     <Link
-      to="/approve/$requestId"
-      params={{ requestId }}
+      to="/c/$token/approve/$requestId"
+      params={{ token, requestId }}
       className="inline-flex h-12 items-center text-sm font-medium text-ink underline-offset-4 hover:underline"
     >
       {label}
     </Link>
   );
+}
+
+function useRouterStateToken() {
+  const projects = useLedger((s) => s.projects);
+  const active = useLedger((s) => s.activeProjectId);
+  return projects.find((p) => p.id === active)?.clientToken ?? projects[0]?.clientToken;
 }

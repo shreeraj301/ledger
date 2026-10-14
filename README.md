@@ -7,4 +7,4 @@ npm install
 npm run dev
 ```
 
-The studio opens on the Mehta residence in Pune. Use **Client link** for the homeowner view — approvals work from that link with no account. The record is shared through Supabase once the `ledger` table exists. **Reset sample studio** restores the original record.
+A studio signs in at `/sign-in`. Each studio is its own firm. Clients open a private link and never make an account. Run `supabase/migrations/20261014_firms.sql` in the Supabase SQL editor before the first signup.

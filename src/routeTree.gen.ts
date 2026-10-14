@@ -14,8 +14,12 @@ import { Route as BillingRouteImport } from './routes/billing'
 import { Route as ChangesRouteImport } from './routes/changes'
 import { Route as DecisionsRouteImport } from './routes/decisions'
 import { Route as DrawingsRouteImport } from './routes/drawings'
+import { Route as SignInRouteImport } from './routes/sign-in'
 import { Route as ApproveRequestIdRouteImport } from './routes/approve.$requestId'
+import { Route as CTokenRouteImport } from './routes/c.$token'
 import { Route as ClientProjectIdRouteImport } from './routes/client.$projectId'
+import { Route as CTokenIndexRouteImport } from './routes/c.$token.index'
+import { Route as CTokenApproveRequestIdRouteImport } from './routes/c.$token.approve.$requestId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -42,15 +46,35 @@ const DrawingsRoute = DrawingsRouteImport.update({
   path: '/drawings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SignInRoute = SignInRouteImport.update({
+  id: '/sign-in',
+  path: '/sign-in',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApproveRequestIdRoute = ApproveRequestIdRouteImport.update({
   id: '/approve/$requestId',
   path: '/approve/$requestId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CTokenRoute = CTokenRouteImport.update({
+  id: '/c/$token',
+  path: '/c/$token',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ClientProjectIdRoute = ClientProjectIdRouteImport.update({
   id: '/client/$projectId',
   path: '/client/$projectId',
   getParentRoute: () => rootRouteImport,
+} as any)
+const CTokenIndexRoute = CTokenIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => CTokenRoute,
+} as any)
+const CTokenApproveRequestIdRoute = CTokenApproveRequestIdRouteImport.update({
+  id: '/approve/$requestId',
+  path: '/approve/$requestId',
+  getParentRoute: () => CTokenRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -59,8 +83,12 @@ export interface FileRoutesByFullPath {
   '/changes': typeof ChangesRoute
   '/decisions': typeof DecisionsRoute
   '/drawings': typeof DrawingsRoute
+  '/sign-in': typeof SignInRoute
   '/approve/$requestId': typeof ApproveRequestIdRoute
+  '/c/$token': typeof CTokenRouteWithChildren
   '/client/$projectId': typeof ClientProjectIdRoute
+  '/c/$token/': typeof CTokenIndexRoute
+  '/c/$token/approve/$requestId': typeof CTokenApproveRequestIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -68,8 +96,11 @@ export interface FileRoutesByTo {
   '/changes': typeof ChangesRoute
   '/decisions': typeof DecisionsRoute
   '/drawings': typeof DrawingsRoute
+  '/sign-in': typeof SignInRoute
   '/approve/$requestId': typeof ApproveRequestIdRoute
   '/client/$projectId': typeof ClientProjectIdRoute
+  '/c/$token': typeof CTokenIndexRoute
+  '/c/$token/approve/$requestId': typeof CTokenApproveRequestIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -78,8 +109,12 @@ export interface FileRoutesById {
   '/changes': typeof ChangesRoute
   '/decisions': typeof DecisionsRoute
   '/drawings': typeof DrawingsRoute
+  '/sign-in': typeof SignInRoute
   '/approve/$requestId': typeof ApproveRequestIdRoute
+  '/c/$token': typeof CTokenRouteWithChildren
   '/client/$projectId': typeof ClientProjectIdRoute
+  '/c/$token/': typeof CTokenIndexRoute
+  '/c/$token/approve/$requestId': typeof CTokenApproveRequestIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -89,8 +124,12 @@ export interface FileRouteTypes {
     | '/changes'
     | '/decisions'
     | '/drawings'
+    | '/sign-in'
     | '/approve/$requestId'
+    | '/c/$token'
     | '/client/$projectId'
+    | '/c/$token/'
+    | '/c/$token/approve/$requestId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -98,8 +137,11 @@ export interface FileRouteTypes {
     | '/changes'
     | '/decisions'
     | '/drawings'
+    | '/sign-in'
     | '/approve/$requestId'
     | '/client/$projectId'
+    | '/c/$token'
+    | '/c/$token/approve/$requestId'
   id:
     | '__root__'
     | '/'
@@ -107,8 +149,12 @@ export interface FileRouteTypes {
     | '/changes'
     | '/decisions'
     | '/drawings'
+    | '/sign-in'
     | '/approve/$requestId'
+    | '/c/$token'
     | '/client/$projectId'
+    | '/c/$token/'
+    | '/c/$token/approve/$requestId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,7 +163,9 @@ export interface RootRouteChildren {
   ChangesRoute: typeof ChangesRoute
   DecisionsRoute: typeof DecisionsRoute
   DrawingsRoute: typeof DrawingsRoute
+  SignInRoute: typeof SignInRoute
   ApproveRequestIdRoute: typeof ApproveRequestIdRoute
+  CTokenRoute: typeof CTokenRouteWithChildren
   ClientProjectIdRoute: typeof ClientProjectIdRoute
 }
 
@@ -158,11 +206,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DrawingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sign-in': {
+      id: '/sign-in'
+      path: '/sign-in'
+      fullPath: '/sign-in'
+      preLoaderRoute: typeof SignInRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/approve/$requestId': {
       id: '/approve/$requestId'
       path: '/approve/$requestId'
       fullPath: '/approve/$requestId'
       preLoaderRoute: typeof ApproveRequestIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/c/$token': {
+      id: '/c/$token'
+      path: '/c/$token'
+      fullPath: '/c/$token'
+      preLoaderRoute: typeof CTokenRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/client/$projectId': {
@@ -172,8 +234,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ClientProjectIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/c/$token/': {
+      id: '/c/$token/'
+      path: '/'
+      fullPath: '/c/$token/'
+      preLoaderRoute: typeof CTokenIndexRouteImport
+      parentRoute: typeof CTokenRoute
+    }
+    '/c/$token/approve/$requestId': {
+      id: '/c/$token/approve/$requestId'
+      path: '/approve/$requestId'
+      fullPath: '/c/$token/approve/$requestId'
+      preLoaderRoute: typeof CTokenApproveRequestIdRouteImport
+      parentRoute: typeof CTokenRoute
+    }
   }
 }
+
+interface CTokenRouteChildren {
+  CTokenIndexRoute: typeof CTokenIndexRoute
+  CTokenApproveRequestIdRoute: typeof CTokenApproveRequestIdRoute
+}
+
+const CTokenRouteChildren: CTokenRouteChildren = {
+  CTokenIndexRoute: CTokenIndexRoute,
+  CTokenApproveRequestIdRoute: CTokenApproveRequestIdRoute,
+}
+
+const CTokenRouteWithChildren =
+  CTokenRoute._addFileChildren(CTokenRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -181,7 +270,9 @@ const rootRouteChildren: RootRouteChildren = {
   ChangesRoute: ChangesRoute,
   DecisionsRoute: DecisionsRoute,
   DrawingsRoute: DrawingsRoute,
+  SignInRoute: SignInRoute,
   ApproveRequestIdRoute: ApproveRequestIdRoute,
+  CTokenRoute: CTokenRouteWithChildren,
   ClientProjectIdRoute: ClientProjectIdRoute,
 }
 export const routeTree = rootRouteImport

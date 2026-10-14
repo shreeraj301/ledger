@@ -86,9 +86,13 @@ export async function saveRemote(data: LedgerData) {
   await syncTokens(next.projects);
 }
 
+let watchingFirm: string | null = null;
+
 export function watchRemote(onChange: (data: LedgerData) => void) {
   const db = supabase();
   if (!db || !firmId) return () => {};
+  if (watchingFirm === firmId) return () => {};
+  watchingFirm = firmId;
   const id = firmId;
   const channel = db
     .channel(`studio-${id}`)
@@ -102,6 +106,7 @@ export function watchRemote(onChange: (data: LedgerData) => void) {
     )
     .subscribe();
   return () => {
+    if (watchingFirm === id) watchingFirm = null;
     void db.removeChannel(channel);
   };
 }

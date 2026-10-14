@@ -444,6 +444,8 @@ function applyRemote(next: LedgerData) {
   applyingRemote = false;
 }
 
+let hydratedFirm = false;
+
 export async function hydrateLedger() {
   if (!remoteEnabled || typeof window === "undefined") return false;
   try {
@@ -452,7 +454,10 @@ export async function hydrateLedger() {
     const remote = await loadRemote();
     if (remote) applyRemote(remote);
     remoteLive = true;
-    watchRemote((next) => applyRemote(next));
+    if (!hydratedFirm) {
+      hydratedFirm = true;
+      watchRemote((next) => applyRemote(next));
+    }
     if (!subscribed) {
       subscribed = true;
       useLedger.subscribe(() => scheduleSave());

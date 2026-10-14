@@ -15,9 +15,9 @@
   --color-hairline-soft: #efe8df;
   --color-surface: #efeae3;
   --color-surface-strong: #e6dfd5;
-  --color-primary: #ff385c;
-  --color-primary-active: #e00b41;
-  --color-primary-soft: #ffd6de;
+  --color-primary: #9c3b2e;
+  --color-primary-active: #7c2e24;
+  --color-primary-soft: #f3e4e0;
   --color-error: #c13515;
   --color-on-primary: #ffffff;
 
@@ -32,6 +32,11 @@
   --text-display--line-height: 1.12;
   --text-title: 1.5rem;
   --text-title--line-height: 1.25;
+
+  --ease-instant: cubic-bezier(0.2, 0, 0, 1);
+  --ease-state: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-instant: 120ms;
+  --duration-state: 200ms;
 }
 
 .dark {
@@ -44,9 +49,9 @@
   --color-hairline-soft: #241f1b;
   --color-surface: #1c1916;
   --color-surface-strong: #26221d;
-  --color-primary: #ff4d6d;
-  --color-primary-active: #ff385c;
-  --color-primary-soft: #4a2430;
+  --color-primary: #e07a68;
+  --color-primary-active: #c45c4c;
+  --color-primary-soft: #3a2420;
   --color-error: #ff8f78;
   --color-on-primary: #ffffff;
   --shadow-lift: rgba(0, 0, 0, 0.35) 0 12px 32px, rgba(243, 238, 230, 0.08) 0 0 0 1px;
@@ -103,8 +108,8 @@
 html.theme-ready body,
 html.theme-ready body * {
   transition-property: background-color, color, border-color, outline-color;
-  transition-duration: 220ms;
-  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+  transition-duration: var(--duration-state);
+  transition-timing-function: var(--ease-state);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -113,5 +118,16 @@ html.theme-ready body * {
   *::after {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes ledger-sheet {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

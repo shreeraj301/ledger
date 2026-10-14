@@ -28,7 +28,7 @@ export interface CreateRequestInput {
 
 interface Actions {
   setActiveProject: (id: string) => void;
-  approveRequest: (id: string, opts?: { comment?: string; optionId?: string }) => void;
+  approveRequest: (id: string, opts?: { comment?: string; optionId?: string; decidedBy?: string }) => void;
   requestChange: (id: string, note: string) => void;
   addComment: (id: string, comment: string) => void;
   addWhatsApp: (input: {
@@ -108,7 +108,7 @@ export const useLedger = create<LedgerState>()(
         const now = new Date().toISOString();
         const optionId = opts?.optionId ?? req.selectedOptionId;
         const option = req.options?.find((o) => o.id === optionId);
-        const client = project.clientName;
+        const client = opts?.decidedBy?.trim() || project.clientName;
 
         const outcome = option
           ? `Chose “${option.label}”.${opts?.comment ? ` ${opts.comment}` : ""}`

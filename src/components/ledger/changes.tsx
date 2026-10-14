@@ -51,8 +51,7 @@ export function ChangesPage() {
               const invoice = invoices.find((inv) => inv.approvalIds.includes(req.id));
               return (
                 <li key={req.id} className="border-t border-hairline pt-8">
-                  <p className="text-xs font-semibold tracking-widest text-muted uppercase">Outside the agreed scope</p>
-                  <h2 className="mt-2 font-display text-title font-medium">{req.title}</h2>
+                  <h2 className="font-display text-title font-medium">{req.title}</h2>
                   {typeof req.feeImpact === "number" ? (
                     <p className="mt-3 font-display text-title font-medium tabular-nums">{inr(req.feeImpact)}</p>
                   ) : null}

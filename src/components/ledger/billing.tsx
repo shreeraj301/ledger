@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { formatDay, inr } from "@/lib/ledger/format";
 import { useProjectData } from "@/lib/ledger/use-project";
-import { Photo, StatusMark } from "./primitives";
+import { Photo, StatusMark, cx } from "./primitives";
 import { StudioShell } from "./shell";
 
 export function BillingPage() {
@@ -35,7 +35,14 @@ export function BillingPage() {
               </div>
               <div className="mt-2 flex flex-wrap items-baseline justify-between gap-3">
                 <h2 className="font-display text-xl font-medium">{invoice.title}</h2>
-                <p className="font-display text-title font-medium tabular-nums">{inr(invoice.amount)}</p>
+                <p
+                  className={cx(
+                    "font-display text-title font-medium tabular-nums",
+                    invoice.status === "paid" ? "text-muted" : "text-ink",
+                  )}
+                >
+                  {inr(invoice.amount)}
+                </p>
               </div>
               <p className="mt-1 text-sm text-muted">
                 {phase?.name} · {formatDay(invoice.issuedAt)}

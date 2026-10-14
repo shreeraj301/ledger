@@ -74,7 +74,7 @@ export function StudioShell({
                 id="project-switch"
                 value={project?.id}
                 onChange={(event) => setActiveProject(event.target.value)}
-                className="h-11 min-w-0 flex-1 rounded-full border border-hairline bg-surface px-4 text-sm text-ink sm:max-w-56 sm:flex-none"
+                className="h-11 min-w-0 flex-1 rounded-sm border border-hairline bg-surface px-4 text-sm text-ink sm:max-w-56 sm:flex-none"
               >
                 {projects.map((item) => (
                   <option key={item.id} value={item.id}>
@@ -86,7 +86,7 @@ export function StudioShell({
                 <Link
                   to="/client/$projectId"
                   params={{ projectId: project.id }}
-                  className="inline-flex h-11 shrink-0 items-center rounded-full border border-hairline px-4 text-sm font-medium text-ink hover:bg-surface"
+                  className="inline-flex h-11 shrink-0 items-center rounded-sm border border-hairline px-4 text-sm font-medium text-ink hover:bg-surface"
                 >
                   Client view
                 </Link>

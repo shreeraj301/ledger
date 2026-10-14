@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type Ref } from "react";
 import { Link, useRouter } from "@tanstack/react-router";
 import { clsx } from "clsx";
 import { dotClass, statusLabel } from "@/lib/ledger/format";
@@ -56,6 +56,7 @@ export function PrimaryButton({
   disabled,
   onClick,
   className,
+  buttonRef,
 }: {
   children: React.ReactNode;
   type?: "button" | "submit";
@@ -63,16 +64,43 @@ export function PrimaryButton({
   disabled?: boolean;
   onClick?: () => void;
   className?: string;
+  buttonRef?: Ref<HTMLButtonElement>;
 }) {
   return (
     <button
+      ref={buttonRef}
       type={type}
       disabled={disabled}
       onClick={onClick}
       className={cx(
         "inline-flex h-12 items-center justify-center px-6 text-base font-medium text-on-primary",
-        "bg-primary hover:bg-primary-active disabled:bg-primary-soft",
+        "bg-primary transition-[background-color,transform] duration-[120ms] ease-[var(--ease-instant)] hover:bg-primary-active active:scale-[0.98] disabled:bg-primary-soft disabled:active:scale-100",
         pill ? "w-full rounded-full" : "rounded-sm",
+        className,
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+export function SecondaryButton({
+  children,
+  onClick,
+  type = "button",
+  className,
+}: {
+  children: React.ReactNode;
+  onClick?: () => void;
+  type?: "button" | "submit";
+  className?: string;
+}) {
+  return (
+    <button
+      type={type}
+      onClick={onClick}
+      className={cx(
+        "inline-flex h-12 items-center justify-center rounded-sm border border-hairline bg-canvas px-5 text-base text-ink hover:bg-surface",
         className,
       )}
     >
@@ -94,7 +122,7 @@ export function QuietButton({
     <button
       type={type}
       onClick={onClick}
-      className="inline-flex h-12 items-center justify-center rounded-full px-4 text-base text-ink underline-offset-4 hover:underline"
+      className="inline-flex h-12 items-center justify-center px-1 text-base text-ink underline-offset-4 hover:underline"
     >
       {children}
     </button>
@@ -128,7 +156,7 @@ export function CopyLink({ requestId }: { requestId: string }) {
             setState("shown");
           }
         }}
-        className="inline-flex h-12 items-center justify-center rounded-full border border-hairline bg-canvas px-4 text-sm font-medium text-ink hover:bg-surface"
+        className="inline-flex h-12 items-center justify-center rounded-sm border border-hairline bg-canvas px-4 text-sm font-medium text-ink hover:bg-surface"
       >
         {state === "copied" ? "Link copied" : "Copy link"}
       </button>

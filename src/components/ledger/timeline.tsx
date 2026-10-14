@@ -12,12 +12,13 @@ export function TimelinePage() {
   const current = phases.find((p) => p.status === "current");
   const waiting = requests.filter((r) => r.status === "pending");
   const who = firstName(project.clientName);
+  const underway = (name: string) => (/s$/i.test(name) ? `${name} are underway` : `${name} is underway`);
   const lede = current
     ? waiting.length === 0
-      ? `${current.name} is underway. Nothing is waiting on ${who}.`
+      ? `${underway(current.name)}. Nothing is waiting on ${who}.`
       : waiting.length === 1
-        ? `${current.name} is underway. ${waiting[0]?.title} is with ${who}.`
-        : `${current.name} is underway. ${waiting.length} things are with ${who}.`
+        ? `${underway(current.name)}. ${waiting[0]?.title} is with ${who}.`
+        : `${underway(current.name)}. ${waiting.length} things are with ${who}.`
     : "Every phase on this project is closed.";
 
   return (
@@ -53,7 +54,7 @@ export function TimelinePage() {
                     {req.image ? (
                       <Photo
                         src={req.image}
-                        alt=""
+                        alt={req.title}
                         className="aspect-[3/2] w-full rounded-sm transition-shadow duration-200 group-hover:shadow-lift"
                       />
                     ) : (
@@ -117,8 +118,8 @@ export function TimelinePage() {
                     <p className="mt-2 text-sm text-muted">Closed</p>
                   ) : null}
                   {linked.length > 0 ? (
-                    <ul className="mt-4 flex gap-3 overflow-x-auto pb-1">
-                      {linked.map((drawing) => {
+                    <ul className="mt-4 flex flex-wrap gap-3">
+                      {linked.slice(0, 2).map((drawing) => {
                         const shot =
                           drawing.versions.find((v) => v.status === "latest_approved") ??
                           drawing.versions.find((v) => v.status === "pending") ??
@@ -127,13 +128,20 @@ export function TimelinePage() {
                         return (
                           <li key={drawing.id}>
                             <Link to="/drawings" className="block w-32">
-                              <Photo src={shot.image} alt="" className="aspect-[3/2] w-full rounded-sm" />
+                              <Photo src={shot.image} alt={drawing.title} className="aspect-[3/2] w-full rounded-sm" />
                               <span className="mt-2 block text-sm text-ink">{drawing.title}</span>
                               <span className="block text-sm text-muted">{drawing.sheet}</span>
                             </Link>
                           </li>
                         );
                       })}
+                      {linked.length > 2 ? (
+                        <li className="flex items-end">
+                          <Link to="/drawings" className="text-sm font-medium text-ink underline-offset-4 hover:underline">
+                            +{linked.length - 2} sheets
+                          </Link>
+                        </li>
+                      ) : null}
                     </ul>
                   ) : null}
                 </div>

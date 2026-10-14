@@ -102,7 +102,7 @@ export function StudioShell({
       </main>
       <footer className="mx-auto max-w-5xl px-5 pb-28 md:px-8">
         <div className="flex flex-col gap-3 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted">A record of what was agreed. Saved in this browser.</p>
+          <p className="text-sm text-muted">A record of what was agreed. Shared with the client.</p>
           <button
             type="button"
             onClick={() => reset()}

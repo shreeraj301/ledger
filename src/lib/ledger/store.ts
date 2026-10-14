@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { inr } from "./format";
+import { loadRemote, remoteEnabled, saveRemote, watchRemote } from "./remote";
 import { SEED } from "./seed";
 import type {
   ActorRole,
@@ -376,3 +377,52 @@ export const useLedger = create<LedgerState>()(
     },
   ),
 );
+
+let remoteLive = false;
+let applyingRemote = false;
+let saveTimer: ReturnType<typeof setTimeout> | null = null;
+
+function snapshot(state: LedgerState): LedgerData {
+  return {
+    activeProjectId: state.activeProjectId,
+    projects: state.projects,
+    phases: state.phases,
+    drawings: state.drawings,
+    requests: state.requests,
+    decisions: state.decisions,
+    invoices: state.invoices,
+  };
+}
+
+function scheduleSave() {
+  if (!remoteLive || applyingRemote) return;
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    void saveRemote(snapshot(useLedger.getState())).catch(() => {});
+  }, 400);
+}
+
+export async function hydrateLedger() {
+  if (!remoteEnabled || typeof window === "undefined") return false;
+  try {
+    const remote = await loadRemote();
+    applyingRemote = true;
+    if (remote) {
+      useLedger.setState(remote);
+    } else {
+      await saveRemote(snapshot(useLedger.getState()));
+    }
+    applyingRemote = false;
+    remoteLive = true;
+    watchRemote((next) => {
+      applyingRemote = true;
+      useLedger.setState(next);
+      applyingRemote = false;
+    });
+    useLedger.subscribe(() => scheduleSave());
+    return true;
+  } catch {
+    applyingRemote = false;
+    return false;
+  }
+}

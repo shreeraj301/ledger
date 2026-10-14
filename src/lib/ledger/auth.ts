@@ -17,8 +17,9 @@ export async function signIn(email: string, password: string) {
 export async function signUp(email: string, password: string) {
   const db = supabase();
   if (!db) throw new Error("Supabase is not configured.");
-  const { error } = await db.auth.signUp({ email, password });
+  const { data, error } = await db.auth.signUp({ email, password });
   if (error) throw error;
+  return Boolean(data.session);
 }
 
 export async function sendMagicLink(email: string) {

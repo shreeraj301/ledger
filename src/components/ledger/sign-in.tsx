@@ -35,7 +35,12 @@ export function SignInPage() {
               await signIn(email, password);
               go();
             } catch (err) {
-              setError(err instanceof Error ? err.message : "Could not sign in.");
+              const message = err instanceof Error ? err.message : "Could not sign in.";
+              setError(
+                /not confirmed/i.test(message)
+                  ? "Confirm the email first, then sign in. Or turn off Confirm email in Supabase."
+                  : message,
+              );
             } finally {
               setBusy(false);
             }
@@ -59,8 +64,9 @@ export function SignInPage() {
               setBusy(true);
               setError("");
               try {
-                await signUp(email, password);
-                setNote("Studio created. You can sign in.");
+                const signedIn = await signUp(email, password);
+                if (signedIn) go();
+                else setNote("Check your email and confirm the address. Then come back and sign in.");
               } catch (err) {
                 setError(err instanceof Error ? err.message : "Could not create the studio.");
               } finally {

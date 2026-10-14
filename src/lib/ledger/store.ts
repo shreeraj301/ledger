@@ -458,9 +458,9 @@ export async function hydrateLedger() {
       useLedger.subscribe(() => scheduleSave());
     }
     return true;
-  } catch {
+  } catch (err) {
     applyingRemote = false;
-    return false;
+    throw err instanceof Error ? err : new Error("Could not open this studio.");
   }
 }
 

@@ -5,6 +5,7 @@ import { ThemeToggle } from "./theme";
 import { useLedger } from "@/lib/ledger/store";
 import { currentSession, onAuth, signOut } from "@/lib/ledger/auth";
 import { BootMark } from "./ready";
+import { hydrateLedger } from "@/lib/ledger/store";
 
 const NAV = [
   { to: "/", label: "Timeline" },
@@ -31,6 +32,8 @@ export function StudioShell({
   const project = projects.find((p) => p.id === activeProjectId) ?? projects[0];
   const navigate = useNavigate();
   const [session, setSession] = useState<"loading" | "in" | "out">("loading");
+  const [studio, setStudio] = useState<"loading" | "ready" | "error">("loading");
+  const [studioError, setStudioError] = useState("");
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState({ name: "", client: "", location: "" });
 
@@ -49,10 +52,41 @@ export function StudioShell({
   }, []);
 
   useEffect(() => {
+    if (session !== "in") return;
+    let stop = false;
+    setStudio("loading");
+    void hydrateLedger()
+      .then((ok) => {
+        if (stop) return;
+        if (ok) setStudio("ready");
+        else {
+          setStudio("error");
+          setStudioError("Could not open this studio. The firm tables may be missing.");
+        }
+      })
+      .catch((err) => {
+        if (stop) return;
+        setStudio("error");
+        setStudioError(err instanceof Error ? err.message : "Could not open this studio.");
+      });
+    return () => {
+      stop = true;
+    };
+  }, [session]);
+
+  useEffect(() => {
     if (session === "out") navigate({ to: "/sign-in" });
   }, [session, navigate]);
 
-  if (session !== "in") return <BootMark />;
+  if (session !== "in" || studio === "loading") return <BootMark />;
+  if (studio === "error") {
+    return (
+      <div className="min-h-screen bg-canvas px-6 pt-8 text-ink">
+        <p className="font-display text-2xl">Ledger</p>
+        <p className="mt-6 max-w-md text-base text-body">{studioError}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-canvas text-ink">

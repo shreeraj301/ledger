@@ -50,7 +50,7 @@ export function SignInPage() {
             <input className={fieldClass} type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </Field>
           <Field label="Password">
-            <input className={fieldClass} type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} />
+            <input className={fieldClass} type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={8} />
           </Field>
           {error ? <p className="text-sm text-error" role="alert">{error}</p> : null}
           {note ? <p className="text-sm text-ink">{note}</p> : null}

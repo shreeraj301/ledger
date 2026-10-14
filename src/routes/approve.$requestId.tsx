@@ -1,11 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ApprovalPage } from "@/components/ledger/client-pages";
+import { DeadLink } from "@/components/ledger/dead-link";
 
 export const Route = createFileRoute("/approve/$requestId")({
-  component: ApproveRoute,
+  component: DeadLink,
 });
-
-function ApproveRoute() {
-  const { requestId } = Route.useParams();
-  return <ApprovalPage key={requestId} requestId={requestId} />;
-}

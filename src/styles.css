@@ -9,7 +9,7 @@
   --color-canvas: #f6f3ee;
   --color-ink: #1c1916;
   --color-body: #3f3a34;
-  --color-muted: #6f675e;
+  --color-muted: #5c564e;
   --color-muted-soft: #a39a90;
   --color-hairline: #e3dbd1;
   --color-hairline-soft: #efe8df;
@@ -97,6 +97,26 @@
   textarea:focus-visible {
     outline: 2px solid var(--color-ink);
     outline-offset: 2px;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: 1rem;
+    top: -4rem;
+    z-index: 80;
+    display: inline-flex;
+    height: 3rem;
+    align-items: center;
+    border-radius: var(--radius-sm);
+    background: var(--color-ink);
+    color: var(--color-canvas);
+    padding: 0 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
   }
 
   ::selection {

@@ -31,23 +31,43 @@ export function Photo({
 export function Field({
   label,
   children,
+  error,
+  hint,
+  id,
 }: {
   label: string;
   children: React.ReactNode;
+  error?: string;
+  hint?: string;
+  id?: string;
 }) {
+  const errorId = id && error ? `${id}-error` : undefined;
+  const hintId = id && hint ? `${id}-hint` : undefined;
   return (
-    <label className="block">
-      <span className="mb-2 block text-sm font-medium text-ink">{label}</span>
-      {children}
-    </label>
+    <div>
+      <label className="block" htmlFor={id}>
+        <span className="mb-2 block text-sm font-medium text-ink">{label}</span>
+        {children}
+      </label>
+      {hint && !error ? (
+        <p id={hintId} className="mt-2 text-sm text-body">
+          {hint}
+        </p>
+      ) : null}
+      {error ? (
+        <p id={errorId} className="mt-2 text-sm text-error" role="alert">
+          {error}
+        </p>
+      ) : null}
+    </div>
   );
 }
 
 export const fieldClass =
-  "h-14 w-full rounded-sm border border-hairline bg-canvas px-3 text-base text-ink outline-none placeholder:text-muted-soft focus:border-ink";
+  "h-14 w-full rounded-sm border border-hairline bg-canvas px-3 text-base text-ink outline-none placeholder:text-muted-soft focus:border-ink aria-[invalid=true]:border-error";
 
 export const areaClass =
-  "min-h-32 w-full rounded-sm border border-hairline bg-canvas px-3 py-3 text-base text-ink outline-none placeholder:text-muted-soft focus:border-ink";
+  "min-h-32 w-full rounded-sm border border-hairline bg-canvas px-3 py-3 text-base text-ink outline-none placeholder:text-muted-soft focus:border-ink aria-[invalid=true]:border-error";
 
 export function PrimaryButton({
   children,
@@ -89,18 +109,24 @@ export function SecondaryButton({
   onClick,
   type = "button",
   className,
+  disabled,
+  expanded,
 }: {
   children: React.ReactNode;
   onClick?: () => void;
   type?: "button" | "submit";
   className?: string;
+  disabled?: boolean;
+  expanded?: boolean;
 }) {
   return (
     <button
       type={type}
       onClick={onClick}
+      disabled={disabled}
+      aria-expanded={expanded}
       className={cx(
-        "inline-flex h-12 items-center justify-center rounded-sm border border-hairline bg-canvas px-5 text-base text-ink hover:bg-surface",
+        "inline-flex h-12 items-center justify-center rounded-sm border border-hairline bg-canvas px-5 text-base text-ink hover:bg-surface disabled:opacity-60",
         className,
       )}
     >
@@ -122,10 +148,28 @@ export function QuietButton({
     <button
       type={type}
       onClick={onClick}
-      className="inline-flex h-12 items-center justify-center px-1 text-base text-ink underline-offset-4 hover:underline"
+      className="inline-flex h-12 items-center justify-center rounded-sm border border-hairline bg-canvas px-5 text-base text-ink hover:bg-surface"
     >
       {children}
     </button>
+  );
+}
+
+export function SkipLink() {
+  return (
+    <a
+      className="skip-link"
+      href="#content"
+      onClick={(event) => {
+        const target = document.getElementById("content");
+        if (!target) return;
+        event.preventDefault();
+        target.focus();
+        target.scrollIntoView();
+      }}
+    >
+      Skip to content
+    </a>
   );
 }
 

@@ -1,6 +1,6 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { useState } from "react";
-import { cx, Field, PrimaryButton, fieldClass } from "./primitives";
+import { useEffect, useState } from "react";
+import { cx, Field, PrimaryButton, SecondaryButton, SkipLink, fieldClass } from "./primitives";
 import { ThemeToggle } from "./theme";
 import { useLedger } from "@/lib/ledger/store";
 
@@ -29,10 +29,21 @@ export function StudioShell({
   const createProject = useLedger((s) => s.createProject);
   const project = projects.find((p) => p.id === activeProjectId) ?? projects[0];
   const [adding, setAdding] = useState(false);
+  const [confirmReset, setConfirmReset] = useState(false);
   const [draft, setDraft] = useState({ name: "", client: "", location: "" });
+
+  useEffect(() => {
+    if (!confirmReset) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setConfirmReset(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [confirmReset]);
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
+      <SkipLink />
       <header className="sticky top-0 z-20 border-b border-hairline bg-canvas">
         <div className="mx-auto max-w-5xl px-5 md:px-8">
           <div className="flex items-center justify-between gap-4 py-4">
@@ -67,7 +78,7 @@ export function StudioShell({
                     key={item.to}
                     to={item.to}
                     className={cx(
-                      "flex min-h-11 items-center justify-center px-1 text-center text-xs font-medium leading-tight sm:h-11 sm:rounded-full sm:px-4 sm:text-sm",
+                      "flex min-h-11 items-center justify-center px-1 text-center text-[13px] font-medium leading-tight sm:h-11 sm:rounded-full sm:px-4 sm:text-sm",
                       active
                         ? "bg-ink text-canvas"
                         : "bg-canvas text-muted hover:text-ink sm:bg-transparent sm:hover:bg-surface",
@@ -107,7 +118,7 @@ export function StudioShell({
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-5xl px-5 py-8 md:px-8 md:py-12">
+      <main id="content" tabIndex={-1} className="mx-auto max-w-5xl px-5 py-8 outline-none md:px-8 md:py-12">
         <h1 className="font-display text-display font-medium tracking-tight">{title}</h1>
         {lede ? <p className="mt-4 max-w-2xl text-base leading-relaxed text-body">{lede}</p> : null}
         <div className="mt-10">{children}</div>
@@ -140,29 +151,49 @@ export function StudioShell({
               <PrimaryButton type="submit">Create project</PrimaryButton>
             </form>
           ) : (
-            <button type="button" onClick={() => setAdding(true)} className="text-sm font-medium text-ink underline-offset-4 hover:underline">
-              New project
-            </button>
+            <SecondaryButton onClick={() => setAdding(true)}>New project</SecondaryButton>
           )}
         </div>
       </main>
       <footer className="mx-auto max-w-5xl px-5 pb-28 md:px-8">
         <div className="flex flex-col gap-3 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted">A record of what was agreed. Sample studio, saved in this browser.</p>
+          <p className="text-sm text-body">A record of what was agreed. Sample studio, saved in this browser.</p>
           <div className="flex items-center gap-5">
-            <Link to="/case-study" className="h-11 text-sm text-ink underline-offset-4 hover:underline sm:hidden">
+            <Link to="/case-study" className="inline-flex h-11 items-center text-sm text-ink underline-offset-4 hover:underline sm:hidden">
               Case study
             </Link>
-            <button
-              type="button"
-              onClick={() => reset()}
-              className="h-11 self-start text-sm text-ink underline-offset-4 hover:underline"
-            >
-              Reset sample studio
-            </button>
+            <SecondaryButton onClick={() => setConfirmReset(true)}>Reset sample studio</SecondaryButton>
           </div>
         </div>
       </footer>
+      {confirmReset ? (
+        <div className="fixed inset-0 z-50 grid place-items-end bg-ink/40 p-4 sm:place-items-center">
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="reset-title"
+            className="w-full max-w-md rounded-lg bg-canvas p-6 text-ink"
+          >
+            <h2 id="reset-title" className="font-display text-xl font-medium">
+              Reset the sample studio?
+            </h2>
+            <p className="mt-3 text-base text-body">
+              This replaces the projects in this browser with the original Mehta and Iyer sample. Changes you made here are removed. It does not touch a real client.
+            </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <SecondaryButton onClick={() => setConfirmReset(false)}>Cancel</SecondaryButton>
+              <PrimaryButton
+                onClick={() => {
+                  reset();
+                  setConfirmReset(false);
+                }}
+              >
+                Reset sample data
+              </PrimaryButton>
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

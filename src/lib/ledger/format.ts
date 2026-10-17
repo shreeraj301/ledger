@@ -19,7 +19,7 @@ const when = new Intl.DateTimeFormat("en-IN", {
 const rupee = new Intl.NumberFormat("en-IN", {
   style: "currency",
   currency: "INR",
-  maximumFractionDigits: 0,
+  maximumFractionDigits: 2,
 });
 
 export function formatDay(iso: string) {
@@ -76,10 +76,27 @@ export function statusLabel(status: string) {
     case "latest_approved":
       return "Latest approved";
     case "superseded":
-      return "Superseded";
+      return "Replaced by a newer version";
     default:
       return status;
   }
+}
+
+export function parseFee(raw: string): number | null {
+  const cleaned = raw.trim().replace(/[₹\s]/g, "").replace(/,/g, "");
+  if (!/^\d+(\.\d{1,2})?$/.test(cleaned)) return null;
+  const value = Number(cleaned);
+  if (!Number.isFinite(value) || value <= 0) return null;
+  return value;
+}
+
+export function revisionNote(label: string) {
+  const match = /^Rev\s+([A-Z])$/i.exec(label.trim());
+  if (!match) return "";
+  const n = match[1].toUpperCase().charCodeAt(0) - 64;
+  if (n === 1) return "Rev A is the first version issued.";
+  if (n === 2) return "Rev B is the second version issued.";
+  return `${label} is issued version ${n}.`;
 }
 
 export function kindLabel(kind: RequestKind, outOfScope?: boolean) {

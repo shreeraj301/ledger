@@ -2,7 +2,7 @@ import { useState } from "react";
 import { formatDay, inr } from "@/lib/ledger/format";
 import { useProjectData } from "@/lib/ledger/use-project";
 import { RequestComposer, SentNote } from "./composer";
-import { CopyLink, OpenClient, Photo, PrimaryButton, StatusMark } from "./primitives";
+import { CopyLink, OpenClient, Photo, SecondaryButton, StatusMark } from "./primitives";
 import { StudioShell } from "./shell";
 
 export function ChangesPage() {
@@ -18,14 +18,16 @@ export function ChangesPage() {
       title="Changes"
       lede="Work outside the agreed scope is written down with a fee, before anyone says yes."
     >
-      <PrimaryButton
-        onClick={() => {
-          setOpen((value) => !value);
-          setSentId(null);
-        }}
-      >
-        {open ? "Close" : "Record a change"}
-      </PrimaryButton>
+      {open ? null : (
+        <SecondaryButton
+          onClick={() => {
+            setOpen(true);
+            setSentId(null);
+          }}
+        >
+          Record a change
+        </SecondaryButton>
+      )}
       {open ? (
         <RequestComposer
           projectId={project.id}
@@ -67,7 +69,7 @@ export function ChangesPage() {
                     </span>
                     {invoice ? (
                       <span className="text-sm text-muted">
-                        {invoice.number} · {invoice.status === "draft" ? "Draft until they agree" : invoice.status === "due" ? "Now due" : "Paid"}
+                        {invoice.number} · {invoice.status === "draft" ? "Draft, not sent yet" : invoice.status === "due" ? "Now due" : "Paid"}
                       </span>
                     ) : null}
                   </div>

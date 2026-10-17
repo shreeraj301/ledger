@@ -260,6 +260,8 @@ export const useLedger = create<LedgerState>()(
       },
       addWhatsApp: ({ projectId, phaseId, message, actor, actorRole }) => {
         const trimmed = message.trim();
+        const speaker = actor.trim();
+        if (!trimmed || !speaker) return;
         const first = trimmed.split("\n")[0]?.trim() ?? "Note from WhatsApp";
         const title = first.length > 88 ? `${first.slice(0, 85)}…` : first;
         const decision: Decision = {
@@ -269,7 +271,7 @@ export const useLedger = create<LedgerState>()(
           title,
           body: trimmed,
           status: "noted",
-          actor: actor.trim() || "Client",
+          actor: speaker,
           actorRole,
           source: "whatsapp",
           createdAt: new Date().toISOString(),

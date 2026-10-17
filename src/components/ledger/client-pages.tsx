@@ -3,13 +3,16 @@ import { Link } from "@tanstack/react-router";
 import { firstName, formatDay, formatWhen, inr, kindLabel, sourceLabel } from "@/lib/ledger/format";
 import { useLedger } from "@/lib/ledger/store";
 import { useProjectData } from "@/lib/ledger/use-project";
-import { Photo, PrimaryButton, QuietButton, SecondaryButton, StatusMark, areaClass, cx, fieldClass } from "./primitives";
+import { Photo, PrimaryButton, SecondaryButton, SkipLink, StatusMark, areaClass, cx, fieldClass } from "./primitives";
 import { ThemeToggle } from "./theme";
 
 function ClientFrame({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen bg-canvas text-ink">
-      <div className="mx-auto min-h-screen w-full max-w-lg px-5 pb-28 pt-6">{children}</div>
+      <SkipLink />
+      <main id="content" tabIndex={-1} className="mx-auto min-h-screen w-full max-w-lg px-5 pb-28 pt-6 outline-none">
+        {children}
+      </main>
     </div>
   );
 }
@@ -81,7 +84,12 @@ export function ClientHome({ projectId }: { projectId: string }) {
           <ul className="mt-4 space-y-6">
             {waiting.map((req) => (
               <li key={req.id}>
-                <Link to="/approve/$requestId" params={{ requestId: req.id }} className="block">
+                <Link
+                  to="/approve/$requestId"
+                  params={{ requestId: req.id }}
+                  aria-label={`${req.title}, ${req.status === "pending" ? "waiting on you" : req.status === "change_requested" ? "change requested" : "on the record"}`}
+                  className="block"
+                >
                   {req.image ? (
                     <Photo src={req.image} alt="" className="aspect-[3/2] w-full rounded-md" />
                   ) : null}
@@ -154,9 +162,6 @@ export function ApprovalPage({ requestId }: { requestId: string }) {
       <ClientFrame>
         <ClientMark />
         <p className="mt-6 text-base text-body">This approval link doesn’t match anything in the studio.</p>
-        <Link to="/" className="mt-6 inline-flex h-12 items-center text-sm font-medium underline-offset-4 hover:underline">
-          Back to the studio
-        </Link>
       </ClientFrame>
     );
   }
@@ -409,13 +414,13 @@ export function ApprovalPage({ requestId }: { requestId: string }) {
         <p className="text-sm text-body">
           Sent by {project.architect}, {project.firm}
         </p>
-        <p className="mt-1 text-sm text-muted">{formatDay(req.createdAt)}</p>
+        <p className="mt-1 text-sm text-body">{formatDay(req.createdAt)}</p>
         <Link
           to="/client/$projectId"
           params={{ projectId: project.id }}
-          className="mt-4 inline-flex h-12 items-center text-sm font-medium underline-offset-4 hover:underline"
+          className="mt-4 inline-flex h-12 items-center rounded-sm border border-hairline bg-canvas px-5 text-sm font-medium text-ink hover:bg-surface"
         >
-          Back to the project
+          Everything shared with you
         </Link>
       </footer>
     </ClientFrame>

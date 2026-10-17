@@ -486,7 +486,7 @@ export const SEED: LedgerData = {
       projectId: "mehta",
       phaseId: "ph-m-3",
       title: "Don’t pour the plinth yet",
-      body: "Meera: The contractor asked if we can pour the plinth next week. Please don’t — we still haven’t signed the stair.",
+      body: "Meera: The contractor asked if we can pour the plinth next week. Please don’t. We still haven’t signed the stair.",
       status: "noted",
       actor: "Meera Mehta",
       actorRole: "client",

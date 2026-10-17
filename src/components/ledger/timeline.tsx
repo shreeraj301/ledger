@@ -51,8 +51,8 @@ export function TimelinePage() {
               <li key={req.id} className="rounded-lg bg-surface p-3 sm:p-4">
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
                   <Link
-                    to="/c/$token/approve/$requestId"
-                    params={{ token: project.clientToken ?? "", requestId: req.id }}
+                    to="/approve/$requestId"
+                    params={{ requestId: req.id }}
                     className="group grid flex-1 grid-cols-1 items-center gap-4 sm:grid-cols-[11rem_1fr]"
                   >
                     {req.image ? (

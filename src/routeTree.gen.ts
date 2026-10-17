@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as BillingRouteImport } from './routes/billing'
+import { Route as CaseStudyRouteImport } from './routes/case-study'
 import { Route as ChangesRouteImport } from './routes/changes'
 import { Route as DecisionsRouteImport } from './routes/decisions'
 import { Route as DrawingsRouteImport } from './routes/drawings'
@@ -29,6 +30,11 @@ const IndexRoute = IndexRouteImport.update({
 const BillingRoute = BillingRouteImport.update({
   id: '/billing',
   path: '/billing',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CaseStudyRoute = CaseStudyRouteImport.update({
+  id: '/case-study',
+  path: '/case-study',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ChangesRoute = ChangesRouteImport.update({
@@ -80,6 +86,7 @@ const CTokenApproveRequestIdRoute = CTokenApproveRequestIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/billing': typeof BillingRoute
+  '/case-study': typeof CaseStudyRoute
   '/changes': typeof ChangesRoute
   '/decisions': typeof DecisionsRoute
   '/drawings': typeof DrawingsRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/billing': typeof BillingRoute
+  '/case-study': typeof CaseStudyRoute
   '/changes': typeof ChangesRoute
   '/decisions': typeof DecisionsRoute
   '/drawings': typeof DrawingsRoute
@@ -106,6 +114,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/billing': typeof BillingRoute
+  '/case-study': typeof CaseStudyRoute
   '/changes': typeof ChangesRoute
   '/decisions': typeof DecisionsRoute
   '/drawings': typeof DrawingsRoute
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/billing'
+    | '/case-study'
     | '/changes'
     | '/decisions'
     | '/drawings'
@@ -134,6 +144,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/billing'
+    | '/case-study'
     | '/changes'
     | '/decisions'
     | '/drawings'
@@ -146,6 +157,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/billing'
+    | '/case-study'
     | '/changes'
     | '/decisions'
     | '/drawings'
@@ -160,6 +172,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   BillingRoute: typeof BillingRoute
+  CaseStudyRoute: typeof CaseStudyRoute
   ChangesRoute: typeof ChangesRoute
   DecisionsRoute: typeof DecisionsRoute
   DrawingsRoute: typeof DrawingsRoute
@@ -183,6 +196,13 @@ declare module '@tanstack/react-router' {
       path: '/billing'
       fullPath: '/billing'
       preLoaderRoute: typeof BillingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/case-study': {
+      id: '/case-study'
+      path: '/case-study'
+      fullPath: '/case-study'
+      preLoaderRoute: typeof CaseStudyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/changes': {
@@ -267,6 +287,7 @@ const CTokenRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   BillingRoute: BillingRoute,
+  CaseStudyRoute: CaseStudyRoute,
   ChangesRoute: ChangesRoute,
   DecisionsRoute: DecisionsRoute,
   DrawingsRoute: DrawingsRoute,

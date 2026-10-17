@@ -56,8 +56,8 @@ export function BillingPage() {
                     {support.map((req) => (
                       <li key={req.id}>
                         <Link
-                          to="/c/$token/approve/$requestId"
-                          params={{ token: project.clientToken ?? "", requestId: req.id }}
+                          to="/approve/$requestId"
+                          params={{ requestId: req.id }}
                           className="flex items-center gap-3 rounded-md hover:shadow-lift"
                         >
                           {req.image ? (

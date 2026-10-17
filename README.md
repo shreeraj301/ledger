@@ -7,4 +7,4 @@ npm install
 npm run dev
 ```
 
-A studio signs in at `/sign-in`. Each studio is its own firm. Clients open a private link and never make an account. Run `supabase/migrations/20261014_firms.sql` in the Supabase SQL editor before the first signup.
+A design prototype of a shared approval record for architects and their clients. Opens on the Mehta residence. Use **Client view** for the homeowner screens. The case study is at `/case-study`.

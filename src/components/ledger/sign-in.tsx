@@ -23,7 +23,7 @@ export function SignInPage() {
         </div>
         <h1 className="mt-16 font-display text-display font-medium">Open your studio</h1>
         <p className="mt-3 text-base text-body">
-          A studio signs in. A client never does — they get a link.
+          A studio signs in. A client never does. They get a link.
         </p>
         <form
           className="mt-8 space-y-4"

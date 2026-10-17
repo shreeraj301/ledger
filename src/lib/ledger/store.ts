@@ -172,7 +172,7 @@ export const useLedger = create<LedgerState>()(
             id: uid("dec"),
             projectId: req.projectId,
             phaseId: req.phaseId,
-            title: option ? `${req.title} — ${option.label}` : req.title,
+            title: option ? `${req.title}: ${option.label}` : req.title,
             body: outcome,
             status: "approved",
             actor: client,

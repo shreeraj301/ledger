@@ -1,6 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { DeadLink } from "@/components/ledger/dead-link";
+import { ClientHome } from "@/components/ledger/client-pages";
 
 export const Route = createFileRoute("/client/$projectId")({
-  component: DeadLink,
+  component: ClientRoute,
 });
+
+function ClientRoute() {
+  const { projectId } = Route.useParams();
+  return <ClientHome projectId={projectId} />;
+}

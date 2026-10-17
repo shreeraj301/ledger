@@ -1,6 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { SignInPage } from "@/components/ledger/sign-in";
+import { createFileRoute, redirect } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/sign-in")({
-  component: SignInPage,
+  beforeLoad: () => {
+    throw redirect({ to: "/" });
+  },
 });

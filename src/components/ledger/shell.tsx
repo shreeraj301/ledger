@@ -1,11 +1,8 @@
-import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { Link, useRouterState } from "@tanstack/react-router";
+import { useState } from "react";
 import { cx, Field, PrimaryButton, fieldClass } from "./primitives";
 import { ThemeToggle } from "./theme";
 import { useLedger } from "@/lib/ledger/store";
-import { currentSession, onAuth, signOut } from "@/lib/ledger/auth";
-import { BootMark } from "./ready";
-import { hydrateLedger } from "@/lib/ledger/store";
 
 const NAV = [
   { to: "/", label: "Timeline" },
@@ -28,65 +25,11 @@ export function StudioShell({
   const projects = useLedger((s) => s.projects);
   const activeProjectId = useLedger((s) => s.activeProjectId);
   const setActiveProject = useLedger((s) => s.setActiveProject);
+  const reset = useLedger((s) => s.reset);
   const createProject = useLedger((s) => s.createProject);
   const project = projects.find((p) => p.id === activeProjectId) ?? projects[0];
-  const navigate = useNavigate();
-  const [session, setSession] = useState<"loading" | "in" | "out">("loading");
-  const [studio, setStudio] = useState<"loading" | "ready" | "error">("loading");
-  const [studioError, setStudioError] = useState("");
   const [adding, setAdding] = useState(false);
   const [draft, setDraft] = useState({ name: "", client: "", location: "" });
-
-  useEffect(() => {
-    let stop = false;
-    const check = async () => {
-      const next = await currentSession();
-      if (!stop) setSession(next ? "in" : "out");
-    };
-    void check();
-    const unsub = onAuth(() => void check());
-    return () => {
-      stop = true;
-      unsub();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (session !== "in") return;
-    let stop = false;
-    setStudio("loading");
-    void hydrateLedger()
-      .then((ok) => {
-        if (stop) return;
-        if (ok) setStudio("ready");
-        else {
-          setStudio("error");
-          setStudioError("Could not open this studio. The firm tables may be missing.");
-        }
-      })
-      .catch((err) => {
-        if (stop) return;
-        setStudio("error");
-        setStudioError(err instanceof Error ? err.message : "Could not open this studio.");
-      });
-    return () => {
-      stop = true;
-    };
-  }, [session]);
-
-  useEffect(() => {
-    if (session === "out") navigate({ to: "/sign-in" });
-  }, [session, navigate]);
-
-  if (session !== "in" || studio === "loading") return <BootMark />;
-  if (studio === "error") {
-    return (
-      <div className="min-h-screen bg-canvas px-6 pt-8 text-ink">
-        <p className="font-display text-2xl">Ledger</p>
-        <p className="mt-6 max-w-md text-base text-body">{studioError}</p>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-canvas text-ink">
@@ -102,7 +45,15 @@ export function StudioShell({
                 <span className="mt-1 block truncate text-sm text-muted">{project?.firm}</span>
               </span>
             </Link>
-            <ThemeToggle />
+            <div className="flex items-center gap-2">
+              <Link
+                to="/case-study"
+                className="hidden h-11 items-center px-3 text-sm text-muted hover:text-ink sm:inline-flex"
+              >
+                Case study
+              </Link>
+              <ThemeToggle />
+            </div>
           </div>
           <div className="flex flex-col gap-3 pb-4 sm:flex-row sm:items-center sm:justify-between">
             <nav
@@ -143,10 +94,10 @@ export function StudioShell({
                   </option>
                 ))}
               </select>
-              {project?.clientToken ? (
+              {project ? (
                 <Link
-                  to="/c/$token"
-                  params={{ token: project.clientToken }}
+                  to="/client/$projectId"
+                  params={{ projectId: project.id }}
                   className="inline-flex h-11 shrink-0 items-center rounded-sm border border-hairline px-4 text-sm font-medium text-ink hover:bg-surface"
                 >
                   Client view
@@ -197,16 +148,19 @@ export function StudioShell({
       </main>
       <footer className="mx-auto max-w-5xl px-5 pb-28 md:px-8">
         <div className="flex flex-col gap-3 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-sm text-muted">A record of what was agreed. Shared with the client.</p>
-          <button
-            type="button"
-            onClick={() => {
-              void signOut().then(() => navigate({ to: "/sign-in" }));
-            }}
-            className="h-11 self-start text-sm text-ink underline-offset-4 hover:underline"
-          >
-            Sign out
-          </button>
+          <p className="text-sm text-muted">A record of what was agreed. Sample studio, saved in this browser.</p>
+          <div className="flex items-center gap-5">
+            <Link to="/case-study" className="h-11 text-sm text-ink underline-offset-4 hover:underline sm:hidden">
+              Case study
+            </Link>
+            <button
+              type="button"
+              onClick={() => reset()}
+              className="h-11 self-start text-sm text-ink underline-offset-4 hover:underline"
+            >
+              Reset sample studio
+            </button>
+          </div>
         </div>
       </footer>
     </div>

@@ -129,7 +129,7 @@ export function RequestComposer({
 export function SentNote({ requestId }: { requestId: string }) {
   return (
     <div className="mt-4 rounded-md bg-surface px-4 py-4">
-      <p className="text-base font-medium text-ink">Sent. This is the link they open — no account.</p>
+      <p className="text-base font-medium text-ink">Sent. This is the link they open. No account.</p>
       <div className="mt-3 flex flex-wrap items-center gap-4">
         <CopyLink requestId={requestId} />
         <OpenClient requestId={requestId} />

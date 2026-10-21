@@ -57,12 +57,6 @@ export function StudioShell({
               </span>
             </Link>
             <div className="flex items-center gap-2">
-              <Link
-                to="/case-study"
-                className="hidden h-11 items-center px-3 text-sm text-muted hover:text-ink sm:inline-flex"
-              >
-                Case study
-              </Link>
               <ThemeToggle />
             </div>
           </div>
@@ -159,9 +153,6 @@ export function StudioShell({
         <div className="flex flex-col gap-3 border-t border-hairline pt-6 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-body">A record of what was agreed. Sample studio, saved in this browser.</p>
           <div className="flex items-center gap-5">
-            <Link to="/case-study" className="inline-flex h-11 items-center text-sm text-ink underline-offset-4 hover:underline sm:hidden">
-              Case study
-            </Link>
             <SecondaryButton onClick={() => setConfirmReset(true)}>Reset sample studio</SecondaryButton>
           </div>
         </div>
